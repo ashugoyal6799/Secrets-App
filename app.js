@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const ejs  = require('ejs');
+const encrypt = require('mongoose-encryption');
+
 
 const app=express();
 
@@ -11,10 +13,15 @@ app.use(bodyParser.urlencoded({extended:true}));
 
 mongoose.connect("mongodb://localhost:27017/userDB",{useNewUrlParser:true , useUnifiedTopology: true});
 
-const userSchema = {
+// user defined schema for using encryption
+const userSchema = new mongoose.Schema({
     email:String,
     password : String
-};
+});
+
+//add plugin before creating the model 
+const secret ="ThisisAshuGoyal";
+userSchema.plugin(encrypt,{secret : secret, encryptedFields: ['password']});
 
 const User  = new mongoose.model("User",userSchema);
 
@@ -45,7 +52,8 @@ app.post('/register',function(req,res){
 app.post('/login',function(req,res){
     const username = req.body.username;
     const password = req.body.password;
-
+    
+    //while findOne mongoose automatically decrypt passoword so that we can match with input password
     User.findOne({email:username},function(err,foundUser){
         if(err){
             console.log(err);
