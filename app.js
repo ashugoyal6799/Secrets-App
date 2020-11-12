@@ -1,3 +1,5 @@
+// .env file is generally used to keep your secret keys and api so that it can't see by anyone
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -20,8 +22,7 @@ const userSchema = new mongoose.Schema({
 });
 
 //add plugin before creating the model 
-const secret ="ThisisAshuGoyal";
-userSchema.plugin(encrypt,{secret : secret, encryptedFields: ['password']});
+userSchema.plugin(encrypt,{secret : process.env.SECRET, encryptedFields: ['password']});
 
 const User  = new mongoose.model("User",userSchema);
 
