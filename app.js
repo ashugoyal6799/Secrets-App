@@ -48,7 +48,6 @@ app.post('/register',function(req,res){
             }
         });
     });
-    
 });
 
 app.post('/login',function(req,res){
