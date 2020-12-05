@@ -4,9 +4,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
-const bcrypt = require("bcrypt");
-
-// in new laptop
+const md5 = require("md5");
 
 const app = express();
 
@@ -38,35 +36,34 @@ app.get("/login", function (req, res) {
 });
 
 app.post("/register", function (req, res) {
-  bcrypt.hash(req.body.password, 5, function (err, hash) {
-    const newUser = new User({
-      email: req.body.username,
-      password: hash,
-    });
-    newUser.save(function (err) {
-      if (err) {
-        console.log(err);
-      } else {
-        res.render("secrets");
-      }
-    });
+  const newUser = new User({
+    email: req.body.username,
+    password: md5(req.body.password),
+  });
+  newUser.save(function (err) {
+    if (err) {
+      console.log(err);
+    } else {
+      res.render("secrets");
+    }
   });
 });
 
 app.post("/login", function (req, res) {
   const username = req.body.username;
-  const password = req.body.password;
+  const password = md5(req.body.password);
 
+  //while findOne mongoose automatically decrypt passoword so that we can match with input password
   User.findOne({ email: username }, function (err, foundUser) {
     if (err) {
       console.log(err);
     } else {
       if (foundUser) {
-        bcrypt.compare(password, foundUser.password, function (err, result) {
-          if (result == true) {
-            res.render("secrets");
-          }
-        });
+        if (foundUser.password === password) {
+          res.render("secrets");
+        } else {
+          res.send("Invalid Email id or password");
+        }
       }
     }
   });

@@ -1,0 +1,112 @@
+Level 1 :
+
+open secret page after successfully regisertation or correct login details(basic mongodb code)
+
+problem -> 1. password is visible in server database
+
+Level 2 :
+
+it involves use of encryption
+
+npm install mongoose-encryption
+
+changes userSchema to 
+const userSchema = new mongoose.Schema({
+  email: String,
+  password: String,
+});
+
+and secret = "ashugoyal"
+
+and then add plugin
+UserSchema.plugin(encrypt,{secret : secret,encryptionFields:["password"]});
+
+During save, documents are encrypted and then signed. 
+During find, documents are authenticated and then decrypted
+
+problem : if any one find your secret(here "ashugoyal") then it can also find your password
+from db and can decrypt it using same package.
+
+Solution : (Using Enviromental Variables to keep Secrets Safe)
+
+if we push code (till now) to github, then anyone can see secret in app.js so to hide
+it we create .env file and inside .env we write secret  
+like  (SECRET=ashugoyal) {do not use space b/w =sign and text}   and  to access 
+secret in app.js first import .env file like (require("dotenv").config(); )
+and to access the secret data in app.js like (proccess.env.SECRET)
+
+and to hide .env file in github add it to .gitignore file.
+
+
+
+LEVEL 3 :
+
+till now we have done encryption : but this is very weak encryption .
+(in encryption we are using a key to encrypt and decrypt the password, but this is 
+not very difficult task to find key)
+
+so we will now use HASHING
+(in hashing we dont need any key , we just need a hash function) and decryption 
+will not happen here .
+lets suppose a user comes and try to login then when he write the 
+password then using hash function it will converted to hashed password and if it matches 
+with hashed password stored in Database then it is correct otherwise not.
+
+to use it in our code :
+npm install md5 
+then 
+var md5 = require('md5');
+
+in regisertation : 
+const newUser = new User({
+      email: req.body.username,
+      password: md5(req.body.username),
+    });
+
+in login : 
+email: req.body.username,
+password: md5(req.body.username)
+
+Note : just replace password(req.body.username) with md5(req.body.username),
+
+
+PROBLEM : not so much secure
+
+to check your password strength : http://password-checker.online-domain-tools.com/
+
+LEVEL 4 :
+
+Salting  : add some characters along with password then pass it to hash function 
+after it will get hashed .
+and for even more secure we can increse the number of rounds of salting.
+
+
+20billion MD5 hashes/second
+17k bcrypt hashes/second
+
+now we will use bcrypt : we need to install bcrypt depending on the your nodejs version
+check Version Compatibility in bcrypt npm website and find your bcrypt version for download.
+
+npm install bcrypt
+(if you get any error while installing it try to install its older version and try to resolve in github and stackoverflow)
+
+To hash a password:
+bcrypt.hash(myPlaintextPassword, saltRounds, function(err, hash) {
+    // Store hash in your password DB.
+    //  (password : hash)
+});
+
+To check a password:
+// Load hash from your password DB.
+bcrypt.compare(myPlaintextPassword, hash, function(err, result) {
+    // result == true
+});
+bcrypt.compare(someOtherPlaintextPassword, hash, function(err, result) {
+    // result == false
+});
+
+
+
+
+
+
