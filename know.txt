@@ -104,9 +104,3 @@ bcrypt.compare(myPlaintextPassword, hash, function(err, result) {
 bcrypt.compare(someOtherPlaintextPassword, hash, function(err, result) {
     // result == false
 });
-
-
-
-
-
-
