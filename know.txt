@@ -104,3 +104,10 @@ bcrypt.compare(myPlaintextPassword, hash, function(err, result) {
 bcrypt.compare(someOtherPlaintextPassword, hash, function(err, result) {
     // result == false
 });
+
+LEVEL 5 : 
+auth using passport.js
+
+
+LEVEL 6 :
+OAuth : Open Authorisation (third party authentication)
